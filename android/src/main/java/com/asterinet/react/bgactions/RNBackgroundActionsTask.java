@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import java.lang.reflect.Field;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,7 +45,6 @@ final public class RNBackgroundActionsTask extends HeadlessJsTaskService {
         
         
         try {
-            // 리플렉션을 사용하여 FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT 존재 여부 확인
             Field flagField = PendingIntent.class.getField("FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT");
             flags |= (Integer) flagField.get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
