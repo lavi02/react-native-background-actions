@@ -43,15 +43,14 @@ final public class RNBackgroundActionsTask extends HeadlessJsTaskService {
         }
         int flags = PendingIntent.FLAG_UPDATE_CURRENT;
         
-        
         try {
             Field flagField = PendingIntent.class.getField("FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT");
             flags |= (Integer) flagField.get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                flags |= PendingIntent.FLAG_IMMUTABLE;
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 flags |= PendingIntent.FLAG_MUTABLE;
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                flags |= PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
             }
         }
 
