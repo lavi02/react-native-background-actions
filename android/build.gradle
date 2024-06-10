@@ -5,6 +5,13 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
+    if ((majorVersion == 7 && minorVersion >= 3) || majorVersion > 7) {
+        namespace "com.asterinet.react.bgactions"
+        buildFeatures {
+            buildConfig true
+        }
+    }
+
     compileSdkVersion safeExtGet('compileSdkVersion', 31)
 
     defaultConfig {
