@@ -41,20 +41,18 @@ final public class RNBackgroundActionsTask extends HeadlessJsTaskService {
             //as RN works on single activity architecture - we don't need to find current activity on behalf of react context
             notificationIntent = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
         }
-        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-        
-        try {
-            Field flagField = PendingIntent.class.getField("FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT");
-            flags |= (Integer) flagField.get(null);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                flags |= PendingIntent.FLAG_MUTABLE;
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                flags |= PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
-            }
-        }
 
-        final PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, flags);
+        final PendingIntent contentIntent;
+        
+        if (android.os.Build.VERSION.SDK_INT >= 34) {
+            contentIntent = PendingIntent.getActivity(context,0, notificationIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT);
+        } else if (Build.VERSION.SDK_INT >= 31) {
+            contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_MUTABLE);
+        } else if (Build.VERSION.SDK_INT >= 23) {
+            contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
         
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setContentTitle(taskTitle)
