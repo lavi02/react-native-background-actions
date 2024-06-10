@@ -5,6 +5,10 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
+    def agpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
+    def majorVersion = agpVersion[0].toInteger()
+    def minorVersion = agpVersion[1].toInteger()
+    
     if ((majorVersion == 7 && minorVersion >= 3) || majorVersion > 7) {
         namespace "com.asterinet.react.bgactions"
         buildFeatures {
