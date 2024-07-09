@@ -10,12 +10,13 @@ import androidx.annotation.NonNull;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 
 @SuppressWarnings("WeakerAccess")
-public class BackgroundActionsModule extends ReactContextBaseJavaModule {
+public class BackgroundActionsModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
     private static final String TAG = "RNBackgroundActions";
 
@@ -26,6 +27,7 @@ public class BackgroundActionsModule extends ReactContextBaseJavaModule {
     public BackgroundActionsModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
+        reactContext.addLifecycleEventListener(this);
     }
 
     @NonNull
@@ -87,5 +89,21 @@ public class BackgroundActionsModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void removeListeners(Integer count) {
         // Keep: Required for RN built in Event Emitter Calls.
+    }
+
+    @Override
+    public void onHostDestroy() {
+        // 앱이 종료될 때 서비스도 종료
+        if (currentServiceIntent != null) {
+            reactContext.stopService(currentServiceIntent);
+        }
+    }
+
+    @Override
+    public void onHostPause() {
+    }
+
+    @Override
+    public void onHostResume() {
     }
 }
