@@ -11,14 +11,30 @@ RCT_EXPORT_MODULE()
     return @[@"expiration"];
 }
 
-- (void) _start
+- (void)requestNotificationPermissions {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert | UNAuthorizationOptionSound | UNAuthorizationOptionBadge)
+                          completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (!granted) {
+            NSLog(@"Notification permissions not granted");
+        }
+    }];
+}
+
+// 백그라운드 작업 시작
+- (void) _start:(NSDictionary *)options
 {
-    [self _stop];
+    [self _stop]; // 기존 백그라운드 작업이 있으면 종료
     bgTask = [[UIApplication sharedApplication] beginBackgroundTaskWithName:@"RNBackgroundActions" expirationHandler:^{
-        [self onExpiration];
+        [self onExpiration]; // 백그라운드 작업이 만료되면 실행
         [[UIApplication sharedApplication] endBackgroundTask: self->bgTask];
         self->bgTask = UIBackgroundTaskInvalid;
     }];
+
+    NSString *notificationTitle = options[@"taskTitle"] ?: @"Fleetune Driver App";
+    NSString *notificationBody = options[@"taskDesc"] ?: @"App is running in background";
+    
+    [self showNotification:notificationTitle body:notificationBody];
 }
 
 - (void) _stop
@@ -35,11 +51,36 @@ RCT_EXPORT_MODULE()
                        body:@{}];
 }
 
+- (void)showNotification:(NSString *)title body:(NSString *)body {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    
+    // 알림 내용 설정
+    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+    content.title = [NSString localizedUserNotificationStringForKey:title arguments:nil];
+    content.body = [NSString localizedUserNotificationStringForKey:body arguments:nil];
+    content.sound = [UNNotificationSound defaultSound];\
+    
+    // 1초 뒤에 알림을 보내도록 설정
+    UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:1 repeats:NO];
+    
+    // 알림 요청 설정
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"RNBackgroundActionsNotification"
+                                                                          content:content
+                                                                          trigger:trigger];
+    
+    // 알림을 추가
+    [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+        if (error != nil) {
+            NSLog(@"Error adding notification: %@", error.localizedDescription);
+        }
+    }];
+}
+
 RCT_EXPORT_METHOD(start:(NSDictionary *)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
-    [self _start];
+    [self _start:options];
     resolve(nil);
 }
 
