@@ -93,7 +93,6 @@ public class BackgroundActionsModule extends ReactContextBaseJavaModule implemen
 
     @Override
     public void onHostDestroy() {
-        // 앱이 종료될 때 서비스도 종료
         if (currentServiceIntent != null) {
             reactContext.stopService(currentServiceIntent);
         }
