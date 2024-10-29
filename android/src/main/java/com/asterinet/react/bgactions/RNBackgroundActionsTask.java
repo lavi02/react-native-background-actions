@@ -128,5 +128,10 @@ final public class RNBackgroundActionsTask extends HeadlessJsTaskService {
     public void onDestroy() {
         super.onDestroy();
         ProcessLifecycleOwner.get().getLifecycle().removeObserver(this);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.cancel(SERVICE_NOTIFICATION_ID);
+        }
     }
 }
