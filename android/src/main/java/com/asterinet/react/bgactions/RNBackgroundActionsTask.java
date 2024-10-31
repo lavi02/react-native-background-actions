@@ -103,24 +103,6 @@ final public class RNBackgroundActionsTask extends HeadlessJsTaskService impleme
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private fun isAppOnForeground(context: Context): Boolean {
-        /**
-         * We need to check if app is in foreground otherwise the app will crash.
-         * https://stackoverflow.com/questions/8489993/check-android-application-is-in-foreground-or-not
-         */
-        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val appProcesses = activityManager.runningAppProcesses ?: return false
-        val packageName: String = context.getPackageName()
-        for (appProcess in appProcesses) {
-            if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
-                    appProcess.processName == packageName
-            ) {
-                return true
-            }
-        }
-        return false
-    }
-
     private void createNotificationChannel(@NonNull final String taskTitle, @NonNull final String taskDesc) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             final int importance = NotificationManager.IMPORTANCE_LOW;
