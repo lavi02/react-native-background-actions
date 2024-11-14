@@ -36,14 +36,6 @@ public class BackgroundActionsModule extends ReactContextBaseJavaModule implemen
         return TAG;
     }
 
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        stopForeground(true);
-        stopSelf();
-
-        super.onTaskRemoved(rootIntent);
-    }
-
     @SuppressWarnings("unused")
     @ReactMethod
     public void start(@NonNull final ReadableMap options, @NonNull final Promise promise) {

@@ -23,7 +23,6 @@ import com.facebook.react.jstasks.HeadlessJsTaskConfig;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
-import androidx.lifecycle.ProcessLifecycleOwner;
 
 final public class RNBackgroundActionsTask extends HeadlessJsTaskService {
 
