@@ -1,4 +1,5 @@
 @import UIKit;
+#import <UserNotifications/UserNotifications.h>
 #import "RNBackgroundActions.h"
 
 @implementation RNBackgroundActions {
